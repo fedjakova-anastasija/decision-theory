@@ -5,19 +5,55 @@ function calculateCapacity(scores, weights, capacity) {
     for (var i = 0; i <= capacity; i++) {
         maxCost[i] = new Array(weights.length + 1).fill(0);
     }
-
-    for (var t = 0; t < weights.length; t++) {
-        for (var s = 1; s <= capacity; s++) {
+    var t;
+    var s;
+    for (t = 1; t <= weights.length; t++) {
+        for (s = 1; s <= capacity; s++) {
             if (weights[t] <= s) {
-                maxCost[s][t + 1] = Math.max(maxCost[s][t], maxCost[s - weights[t]][t] + scores[t]);
+                maxCost[s][t] = Math.max(maxCost[s][t - 1], maxCost[s - weights[t]][t - 1] + scores[t]);
             } else {
-                maxCost[s][t + 1] = maxCost[s][t];
+                maxCost[s][t] = maxCost[s][t - 1];
             }
         }
     }
-
+    var items = [];
+    findItems(items, maxCost, weights, s - 1, t - 1);
+    //console.log(findItems(items, maxCost, weights, s - 1, t - 1));
+    /*for (var j = 0; j <= weights.length; j++) {
+        console.log(scores[items[j]]);
+    }
+    console.log(items);*/
+    showItems(items, scores);
     return maxCost[capacity][weightsCount];
 }
+
+//console.log(calculateCapacity([1, 6, 4, 7, 6], [3, 4, 5, 8, 9], 13));
+
+
+function showItems(items, scores) {
+    for (var i = 0; i < scores.length; i++) {
+        for (var j = 0; i < items.length; j++) {
+            if (scores[items[j]] === document.querySelectorAll(".cost")[i].value) {
+                document.getElementsByClassName('input-group')[i].style.border = '2px solid #000000';
+            }
+        }
+    }
+}
+
+function findItems(items, maxCost, weights, s, t) {
+    if (maxCost[s][t] === 0) {
+        return;
+    }
+    if (maxCost[s][t - 1] === maxCost[s][t]) {
+        findItems(items, maxCost, weights, s, t - 1)
+    }
+    else {
+        findItems(items, maxCost, weights, s - weights[t], t - 1);
+        items.push(t)
+    }
+    return items;
+}
+
 
 function getParam(param) {
     var itemsCount = document.getElementsByClassName('input-group').length;
